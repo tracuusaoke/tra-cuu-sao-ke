@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 
 import { parseDate } from "@internationalized/date";
-import Paper from "@material-ui/core/Paper";
-import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -15,14 +13,13 @@ import TextField from "@mui/material/TextField";
 import { DateRangePicker } from "@nextui-org/react";
 
 import type { Row } from "./row";
-// import SearchBar from "material-ui-search-bar";
 import type { DateValue, RangeValue } from "@nextui-org/react";
 
-const useStyles = makeStyles({
-  table: {
-    minWidth: 650,
-  },
-});
+// const useStyles = makeStyles({
+//   table: {
+//     minWidth: 650,
+//   },
+// });
 
 interface Column {
   id:
@@ -56,7 +53,6 @@ const columns: readonly Column[] = [
 export default function TransactionTable({ allRows }: { allRows: Row[] }) {
   const [rows, setRows] = useState<Row[]>(allRows);
   const [searched, setSearched] = useState<string>("");
-  const classes = useStyles();
 
   useEffect(() => {
     setRows(allRows);
@@ -274,39 +270,6 @@ export default function TransactionTable({ allRows }: { allRows: Row[] }) {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
-      {/* <Paper>
-
-        <TableContainer className="pt-[50px]">
-          <Table className={classes.table} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Ngày giao dịch</TableCell>
-                <TableCell align="right">Số chứng từ</TableCell>
-                <TableCell align="right">Chi (VND)</TableCell>
-                <TableCell align="right">Thu (VND)</TableCell>
-                <TableCell align="right">Số dư (VND)</TableCell>
-                <TableCell align="right">Mô tả giao dịch</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell component="th" scope="row">
-                    {row.TNXDate}
-                  </TableCell>
-                  <TableCell align="right">{row.DocNo}</TableCell>
-                  <TableCell align="right">{row.Debit}</TableCell>
-                  <TableCell align="right">{row.Credit}</TableCell>
-                  <TableCell align="right">{row.Balance}</TableCell>
-                  <TableCell align="right">
-                    {row["Transactions in Detail"]}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper> */}
     </>
   );
 }
