@@ -1,4 +1,5 @@
 import { parse as parseCSVLine } from "csv-parse";
+import * as sha256 from "sha256";
 import { z } from "zod";
 
 import type { Transaction } from "./types/Transaction";
@@ -6,16 +7,7 @@ import type { DateValue, RangeValue } from "@nextui-org/react";
 
 export const TCSKUtils = {
   sha256: async (data: string) => {
-    return crypto.subtle
-      .digest("SHA-256", new TextEncoder().encode(data.toString()))
-      .then((hashBuffer) => {
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray
-          .map((b) => b.toString(16).padStart(2, "0"))
-          .join("");
-
-        return hashHex;
-      });
+    return sha256.default(data);
   },
   lineToCells: async (line: string): Promise<Array<string>> => {
     return new Promise((resolve, reject) => {
