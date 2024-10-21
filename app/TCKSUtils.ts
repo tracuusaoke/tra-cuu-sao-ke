@@ -1,9 +1,9 @@
-import { parse as parseCSVLine } from "csv-parse";
-import * as sha256 from "sha256";
-import { z } from "zod";
+import { parse as parseCSVLine } from 'csv-parse';
+import * as sha256 from 'sha256';
+import { z } from 'zod';
 
-import type { Transaction } from "./types/Transaction";
-import type { DateValue, RangeValue } from "@nextui-org/react";
+import type { DateValue, RangeValue } from '@nextui-org/react';
+import type { Transaction } from '../components/types/Transaction';
 
 export const TCSKUtils = {
   sha256: async (data: string) => {
@@ -11,7 +11,7 @@ export const TCSKUtils = {
   },
   lineToCells: async (line: string): Promise<Array<string>> => {
     return new Promise((resolve, reject) => {
-      parseCSVLine(line, { delimiter: "," }, (err, data) => {
+      parseCSVLine(line, { delimiter: ',' }, (err, data) => {
         if (err) {
           reject(err);
         } else {
@@ -19,7 +19,6 @@ export const TCSKUtils = {
           if (cells.success) {
             resolve(cells.data[0]);
           } else {
-            console.error("FAil at ", cells, " vs ", data);
             reject(cells.error);
           }
         }
@@ -28,7 +27,7 @@ export const TCSKUtils = {
   },
   parseCSV: async (csv: string) => {
     const lines = csv
-      .split("\n")
+      .split('\n')
       .map((line) => line.trim())
       .filter((line) => line.length > 0);
     const headers = await TCSKUtils.lineToCells(lines[0]);
@@ -37,12 +36,13 @@ export const TCSKUtils = {
         const cells = await TCSKUtils.lineToCells(line);
         return headers.reduce(
           (acc, key, i) => ({
+            // biome-ignore lint/performance/noAccumulatingSpread: <explanation>
             ...acc,
-            [key.toLowerCase().trim()]: cells[i],
+            [key.toLowerCase().trim()]: cells[i]
           }),
-          {},
+          {}
         );
-      }),
+      })
     );
 
     return rows;
@@ -52,75 +52,60 @@ export const TCSKUtils = {
   },
   searchUtils: {
     // date in format dd/mm/yyyy
-    isDateIncludedInRange: (
-      curDate: string,
-      dateRange: RangeValue<DateValue>,
-    ) => {
-      const curRowDate = curDate.split("/").reverse().join("-"); // convert into yyyy-mm-dd
-      const startDateStr = new Date(dateRange.start.toString())
-        .toISOString()
-        .split("T")[0];
-      const endDateStr = new Date(dateRange.end.toString())
-        .toISOString()
-        .split("T")[0];
+    isDateIncludedInRange: (curDate: string, dateRange: RangeValue<DateValue>) => {
+      const curRowDate = curDate.split('/').reverse().join('-'); // convert into yyyy-mm-dd
+      const startDateStr = new Date(dateRange.start.toString()).toISOString().split('T')[0];
+      const endDateStr = new Date(dateRange.end.toString()).toISOString().split('T')[0];
 
       return curRowDate >= startDateStr && curRowDate <= endDateStr;
     },
     getSimilarityToSearchContent: (searchContent: string, row: Transaction) => {
-      if (searchContent.trim() === "") {
+      if (searchContent.trim() === '') {
         return {
           similarity: 1,
-          row,
+          row
         };
       }
 
       const keyWords = searchContent
-        .split(" ")
+        .split(' ')
         .map((word) => word.toLowerCase().trim())
         .filter((word) => word.length > 0);
 
       // const rowToString = Object.values(row).join(" ");
       let sim = 0;
-      Object.values(row).forEach((cell) => {
+      for (const cell of Object.values(row)) {
         if (
           cell
             .toString()
             .toLowerCase()
             .trim()
-            .split(" ")
-            .join(" ")
-            .includes(searchContent.toLowerCase().split(" ").join(" "))
+            .split(' ')
+            .join(' ')
+            .includes(searchContent.toLowerCase().split(' ').join(' '))
         ) {
           sim = 1000;
         }
-      });
+      }
 
       if (sim <= 0)
-        keyWords.forEach((word) => {
+        for (const word in keyWords) {
           let maxSimOfCurKeyword = 0;
-          Object.values(row).forEach((cell) => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-            // const curSim = leven(word, cell.toString()) / word.length;
-            // if (curSim > maxSimOfCurKeyword) {
-            //   maxSimOfCurKeyword = curSim;
-            // }
-
-            if (
-              cell.toString().toLowerCase().trim() === word.toLowerCase().trim()
-            ) {
+          const cells = Object.values(row);
+          for (const cell of cells) {
+            if (cell.toString().toLowerCase().trim() === word.toLowerCase().trim()) {
               maxSimOfCurKeyword = 2;
             }
             if (cell.toString().toLowerCase().includes(word)) {
               maxSimOfCurKeyword = 1;
             }
-          });
+          }
           sim += maxSimOfCurKeyword;
-        });
-      // const sim = similarity(searchContent, rowToString) as number;
+        }
       return {
         similarity: sim,
-        row,
+        row
       };
-    },
-  },
+    }
+  }
 };

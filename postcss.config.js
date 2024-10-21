@@ -1,7 +1,7 @@
 const config = {
   plugins: {
-    tailwindcss: {},
-  },
+    tailwindcss: {}
+  }
 };
 
 export default config;

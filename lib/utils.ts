@@ -1,7 +1,7 @@
-import { clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
-import type { ClassValue } from "clsx";
+import type { ClassValue } from 'clsx';
 
 /**
  * Merges the given class names with the tailwind classes
@@ -14,23 +14,23 @@ export function cn(...inputs: ClassValue[]) {
 
 export function toCamelCase(str: string) {
   return str
-    .split(" ")
+    .split(' ')
     .map((word, index) => {
       if (index === 0) {
         return word.toLowerCase();
       }
       return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
     })
-    .join("")
+    .join('')
     .trim();
 }
 
 // convert date from mm-dd-yyyy
 export function formatToCanonicalDateString(date: string) {
   return date
-    .split("/")
-    .map((x) => x.padStart(2, "0"))
+    .split('/')
+    .map((x) => x.padStart(2, '0'))
     .filter((x) => x.trim().length > 0)
-    .join("-")
+    .join('-')
     .trim();
 }

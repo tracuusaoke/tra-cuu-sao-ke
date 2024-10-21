@@ -1,9 +1,9 @@
-import React from "react";
+import type React from 'react';
 
-import { Button, DateRangePicker } from "@nextui-org/react";
-import { MdClear } from "react-icons/md";
+import { Button, DateRangePicker } from '@nextui-org/react';
+import { MdClear } from 'react-icons/md';
 
-import type { DateValue, RangeValue } from "@nextui-org/react";
+import type { DateValue, RangeValue } from '@nextui-org/react';
 
 interface DateRangePickerProps {
   label?: string;
@@ -13,25 +13,20 @@ interface DateRangePickerProps {
 }
 
 export const CustomDateRangePicker: React.FC<DateRangePickerProps> = ({
-  label = "Select Date Range",
+  label = 'Select Date Range',
   value,
   onChange,
-  onReset,
+  onReset
 }) => {
   return (
-    <div className="flex items-center space-x-2">
-      <DateRangePicker
-        label={label}
-        className="w-full md:max-w-xs"
-        onChange={onChange}
-        value={value}
-      />
+    <div className='flex items-center space-x-2'>
+      <DateRangePicker label={label} className='w-full md:max-w-xs' onChange={onChange} value={value} />
       <Button
         isIconOnly
-        color="warning"
-        variant="faded"
+        color='warning'
+        variant='faded'
         onClick={onReset}
-        aria-label="Clear date range filter"
+        aria-label='Clear date range filter'
       >
         <MdClear />
       </Button>
