@@ -1,4 +1,3 @@
-import { nextui } from '@nextui-org/react';
 import { fontFamily } from 'tailwindcss/defaultTheme';
 
 import type { Config } from 'tailwindcss';
@@ -23,8 +22,7 @@ const config = {
       mono: ['var(--font-geist-mono)', ...fontFamily.sans]
     }
   },
-  darkMode: 'class',
-  plugins: [nextui()]
+  darkMode: 'class'
 } satisfies Config;
 
 export default config;

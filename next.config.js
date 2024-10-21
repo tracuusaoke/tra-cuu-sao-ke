@@ -10,11 +10,17 @@ const isProd = process.env.NODE_ENV === 'production';
 const nextConfig = {
   reactStrictMode: true,
   experimental: {
-    ppr: false,
-    reactCompiler: isProd
-    // ...
+    ppr: false
+  },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/datasets',
+        permanent: true
+      }
+    ];
   }
-  // ...
 };
 
 export default nextConfig;
