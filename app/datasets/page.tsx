@@ -2,6 +2,7 @@
 
 import { DatasetAPI } from '@/lib/api/dataset';
 import { useQuery } from '@tanstack/react-query';
+import Link from 'next/link';
 
 export default function DatasetPage() {
   const { data: datasets } = useQuery({
@@ -11,12 +12,13 @@ export default function DatasetPage() {
 
   return (
     <div>
-      {datasets?.map((dataset) => (
-        <div key={dataset.name}>
-          <h2>{dataset.name}</h2>
-          <p>{dataset.description}</p>
-        </div>
-      ))}
+      <ul className='menu menu-md bg-base-200 rounded-box w-56'>
+        {datasets?.map((dataset) => (
+          <li key={dataset.name}>
+            <Link href={`/datasets/${dataset.name}`}>{dataset.name}</Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

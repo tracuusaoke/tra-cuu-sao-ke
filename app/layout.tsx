@@ -14,7 +14,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export default function RootLayout({ children }: React.PropsWithChildren) {
   return (
-    <html lang='en' suppressHydrationWarning className={inter.className}>
+    <html lang='en' suppressHydrationWarning className={inter.className} data-theme='light'>
       <body className='min-h-dvh scroll-smooth font-sans antialiased'>
         <Providers>{children}</Providers>
       </body>
