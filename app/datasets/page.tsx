@@ -12,13 +12,11 @@ export default function DatasetPage() {
 
   return (
     <div>
-      <ul className='menu menu-md bg-base-200 rounded-box w-56'>
-        {datasets?.map((dataset) => (
-          <li key={dataset.name}>
-            <Link href={`/datasets/${dataset.name}`}>{dataset.name}</Link>
-          </li>
-        ))}
-      </ul>
+      {datasets.map((dataset) => (
+        <Link key={dataset.name} href={`/datasets/${dataset.name}`}>
+          {dataset.name}
+        </Link>
+      ))}
     </div>
   );
 }

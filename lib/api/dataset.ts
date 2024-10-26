@@ -6,7 +6,7 @@ export type Dataset = {
 };
 
 export type DatasetFieldSchema = {
-  type: string;
+  type: 'keyword' | 'text' | 'long' | 'double' | 'date' | string;
   format?: string;
 };
 export type DatasetSchema = Record<string, DatasetFieldSchema>;
