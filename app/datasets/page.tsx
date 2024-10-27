@@ -12,10 +12,10 @@ export default function DatasetPage() {
 
   return (
     <div>
-      {datasets.map((dataset) => (
-        <Link key={dataset.name} href={`/datasets/${dataset.name}`}>
-          {dataset.name}
-        </Link>
+      {datasets?.map((dataset) => (
+        <div key={dataset.name}>
+          <Link href={`/datasets/${dataset.name}`}>{dataset.name}</Link>
+        </div>
       ))}
     </div>
   );
