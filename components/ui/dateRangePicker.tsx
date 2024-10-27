@@ -10,7 +10,11 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
-export function DateRangePicker({ className }: React.HTMLAttributes<HTMLDivElement>) {
+type DateRangePickerProps = React.HTMLAttributes<HTMLDivElement> & {
+  placeholder: string;
+};
+
+export function DateRangePicker({ className, placeholder }: DateRangePickerProps) {
   const [date, setDate] = React.useState<DateRange | undefined>();
 
   return (
@@ -35,7 +39,7 @@ export function DateRangePicker({ className }: React.HTMLAttributes<HTMLDivEleme
                 format(date.from, 'LLL dd, y')
               )
             ) : (
-              <span>Pick a date</span>
+              <span>{placeholder}</span>
             )}
           </Button>
         </PopoverTrigger>

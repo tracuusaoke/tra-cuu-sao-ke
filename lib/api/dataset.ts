@@ -5,23 +5,28 @@ export type Dataset = {
   description: string;
 };
 
-export type DatasetFieldSchema = {
+export type FieldSchema = {
   type: 'keyword' | 'text' | 'long' | 'double' | 'date' | string;
-  format?: string;
+  description?: string;
+  displayName: string;
+  name: string;
 };
-export type DatasetSchema = Record<string, DatasetFieldSchema>;
-
 async function list(): Promise<Dataset[]> {
   const resp = await api.get<string[]>('/api/datasets');
   return resp.data.map((name) => ({ name, description: '' }));
 }
 
-async function getSchema(dataset: string): Promise<DatasetSchema> {
-  const resp = await api.get<DatasetSchema>(`/api/datasets/${dataset}/schema`);
+async function getSchema(dataset: string): Promise<FieldSchema[]> {
+  const resp = await api.get(`/api/datasets/${dataset}/schema`);
   return resp.data;
 }
 
-async function getDocuments(dataset: string): Promise<unknown> {
+type Document = {
+  _id: string;
+  [key: string]: unknown;
+};
+
+async function getDocuments<T = Document>(dataset: string): Promise<T[]> {
   const resp = await api.get(`/api/datasets/${dataset}/documents`);
   return resp.data;
 }
