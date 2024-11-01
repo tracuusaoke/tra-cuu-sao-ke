@@ -21,6 +21,10 @@
       },
       "suspicious": {
         "noConsole": "warn"
+      },
+      "correctness": {
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error"
       }
     },
     "ignore": ["dist", "coverage", "node_modules", ".next"]

@@ -1,21 +1,24 @@
 import { Card, CardContent } from '@/components/ui/card';
+import { useExtractDocuments } from '@/hooks/useExtractDocuments';
 import { DatasetAPI, type FieldSchema } from '@/lib/api/dataset';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 export function DatasetTable() {
   const { dataset } = useParams<{ dataset: string }>();
-
-  const { data: records } = useQuery({
-    queryKey: [`/datasets/${dataset}/documents`],
-    queryFn: () => DatasetAPI.getDocuments(dataset)
-  });
 
   const { data: fieldSchemas } = useQuery({
     queryKey: [`/datasets/${dataset}/schema`],
     queryFn: () => DatasetAPI.getSchema(dataset)
   });
+
+  const { data: records, refetch: fetchDocuments } = useExtractDocuments(dataset);
+
+  // Fetch documents on initial render
+  useEffect(() => {
+    fetchDocuments();
+  }, [fetchDocuments]);
 
   const fieldSchemaMap = useMemo(() => {
     if (!fieldSchemas) return {};
@@ -41,10 +44,13 @@ export function DatasetTable() {
                 if (fieldSchemaMap[fieldName]?.type === 'date') {
                   valueStr = new Date(value).toLocaleString();
                 }
+              } else {
+                valueStr = JSON.stringify(value);
               }
+              if (fieldName === '_id') return null;
               return (
                 <div key={fieldName}>
-                  <div className='font-semibold'>{fieldSchemaMap[fieldName]?.displayName || fieldName}</div>
+                  <div className='font-semibold'>{fieldSchemaMap[fieldName]?.displayName ?? fieldName}</div>
                   <div>{valueStr}</div>
                 </div>
               );
