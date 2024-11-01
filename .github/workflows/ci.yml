@@ -25,13 +25,4 @@ jobs:
         run: bun i
 
       - name: Check types
-        run: bun run type-check
-
-      - name: Check linting
-        run: bun run lint
-
-      - name: Run tests
-        run: bun test
-
-      - name: Check commits messages
-        uses: wagoid/commitlint-github-action@v6
+        run: bun run check
