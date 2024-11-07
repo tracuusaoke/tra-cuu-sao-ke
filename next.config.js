@@ -7,6 +7,7 @@ await import('./lib/env.js');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  output: 'standalone',
   experimental: {
     ppr: false
   },
