@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useExtractDocuments } from '@/hooks/useExtractDocuments';
 import { DatasetAPI } from '@/lib/api/dataset';
-import { useFilterStore } from '@/states/filter';
+import { useQueryOptionsState } from '@/states/filter';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { type ChangeEvent, useCallback } from 'react';
@@ -19,7 +19,12 @@ export function DatasetFilter() {
     queryFn: () => DatasetAPI.getSchema(dataset)
   });
 
-  const { filter, setDate, setNumber, setString } = useFilterStore();
+  const {
+    filter,
+    setFilterDate: setDate,
+    setFilterNumber: setNumber,
+    setFilterString: setString
+  } = useQueryOptionsState();
 
   const { refetch: fetchDocuments } = useExtractDocuments(dataset);
 

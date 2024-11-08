@@ -1,11 +1,9 @@
-import type { DatasetFilter } from '@/states/filter';
 import { api } from './http';
 
 export type Dataset = {
   name: string;
   description: string;
 };
-
 export type FieldSchema = {
   type: 'keyword' | 'text' | 'long' | 'double' | 'date' | string;
   name: string;
@@ -31,8 +29,8 @@ type Document = {
   [key: string]: unknown;
 };
 
-async function getDocuments<T = Document>(dataset: string, filter: DatasetFilter): Promise<T[]> {
-  const resp = await api.post(`/api/datasets/${dataset}/documents`, filter);
+async function getDocuments<T = Document>(dataset: string, options: unknown): Promise<T[]> {
+  const resp = await api.post(`/api/datasets/${dataset}/documents`, options);
   return resp.data;
 }
 

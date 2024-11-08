@@ -1,13 +1,33 @@
 import { DatasetAPI } from '@/lib/api/dataset';
-import { useFilterStore } from '@/states/filter';
+import { useQueryOptionsState } from '@/states/filter';
 import { useQuery } from '@tanstack/react-query';
 
 export function useExtractDocuments(dataset: string) {
-  const filter = useFilterStore((state) => state.filter);
+  const queryOptions = useQueryOptionsState();
 
   return useQuery({
     queryKey: [`/datasets/${dataset}/documents`],
-    queryFn: () => DatasetAPI.getDocuments(dataset, filter),
+    queryFn: () => {
+      const filter: Record<string, unknown> = {};
+      const filterEntries = Object.entries(queryOptions.filter);
+      for (const [key, value] of filterEntries) {
+        if (typeof value === 'object') {
+          if ('from' in value) filter[key] = { min: value.from, max: value.to };
+          else filter[key] = value;
+        } else if (typeof value === 'string') {
+          if (value.length === 0) continue;
+          filter[key] = value;
+        } else {
+          filter[key] = value;
+        }
+      }
+      const options = {
+        filter: filter,
+        sort: queryOptions.sort,
+        pagination: queryOptions.pagination
+      };
+      return DatasetAPI.getDocuments(dataset, options);
+    },
     enabled: false
   });
 }
