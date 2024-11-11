@@ -1,39 +1,32 @@
-import { Card, CardContent } from '@/components/ui/card';
-import { useExtractDocuments } from '@/hooks/useExtractDocuments';
-import { DatasetAPI, type FieldSchema } from '@/lib/api/dataset';
-import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+// import { useDatasetSchema } from '@/hooks/data/useDatasetSchema';
+// import type { FieldSchema } from '@/lib/api/dataset';
+// import { useParams } from 'next/navigation';
+// import { useMemo } from 'react';
 
 export function DatasetTable() {
-  const { dataset } = useParams<{ dataset: string }>();
+  // const { dataset } = useParams<{ dataset: string }>();
 
-  const { data: fieldSchemas } = useQuery({
-    queryKey: [`/datasets/${dataset}/schema`],
-    queryFn: () => DatasetAPI.getSchema(dataset)
-  });
+  // const { data: fieldSchemas } = useDatasetSchema(dataset);
 
-  const { data: records, refetch: fetchDocuments } = useExtractDocuments(dataset);
+  // const { data: records, refetch: fetchDocuments } = useExtractDocuments(dataset);
 
-  // Fetch documents on initial render
-  useEffect(() => {
-    fetchDocuments();
-  }, [fetchDocuments]);
+  // // Fetch documents on initial render
+  // useEffect(() => { fetchDocuments() }, [fetchDocuments]);
 
-  const fieldSchemaMap = useMemo(() => {
-    if (!fieldSchemas) return {};
-    return fieldSchemas.reduce(
-      (acc, field) => {
-        acc[field.name] = field;
-        return acc;
-      },
-      {} as Record<string, FieldSchema>
-    );
-  }, [fieldSchemas]);
+  // const fieldSchemaMap = useMemo(() => {
+  //   if (!fieldSchemas) return {};
+  //   return fieldSchemas.reduce(
+  //     (acc, field) => {
+  //       acc[field.name] = field;
+  //       return acc;
+  //     },
+  //     {} as Record<string, FieldSchema>
+  //   );
+  // }, [fieldSchemas]);
 
   return (
     <div className='px-4 flex flex-col gap-4'>
-      {records?.map((record) => (
+      {/* {records?.map((record) => (
         <Card key={record._id}>
           <CardContent className='pt-4 grid gap-2'>
             {Object.entries(record).map(([fieldName, value]) => {
@@ -57,7 +50,7 @@ export function DatasetTable() {
             })}
           </CardContent>
         </Card>
-      ))}
+      ))} */}
     </div>
   );
 }

@@ -15,6 +15,8 @@ type DateRangePickerProps = React.HTMLAttributes<HTMLDivElement> & {
   date: DateRange | undefined;
 };
 
+const dateFormat = 'dd/MM/yy';
+
 export function DateRangePicker({ className, placeholder, onSelect, date }: DateRangePickerProps) {
   return (
     <div className={cn('grid gap-2', className)}>
@@ -23,19 +25,16 @@ export function DateRangePicker({ className, placeholder, onSelect, date }: Date
           <Button
             id='date'
             variant={'outline'}
-            className={cn(
-              'min-w-[300px] justify-start text-left font-normal',
-              !date && 'text-muted-foreground'
-            )}
+            className={cn('justify-start text-left font-normal', !date && 'text-muted-foreground')}
           >
             <CalendarIcon />
             {date?.from ? (
               date.to ? (
                 <>
-                  {format(date.from, 'LLL dd, y')} - {format(date.to, 'LLL dd, y')}
+                  {format(date.from, dateFormat)} - {format(date.to, dateFormat)}
                 </>
               ) : (
-                format(date.from, 'LLL dd, y')
+                format(date.from, dateFormat)
               )
             ) : (
               <span>{placeholder}</span>

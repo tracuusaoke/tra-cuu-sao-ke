@@ -2,128 +2,229 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { DateRangePicker } from '@/components/ui/dateRangePicker';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useExtractDocuments } from '@/hooks/useExtractDocuments';
-import { DatasetAPI } from '@/lib/api/dataset';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import { useDatasetSchema } from '@/hooks/data/useDatasetSchema';
 import { useQueryOptionsState } from '@/states/filter';
-import { useQuery } from '@tanstack/react-query';
+import { CirclePlus, FilterX, Trash2 } from 'lucide-react';
 import { useParams } from 'next/navigation';
-import { type ChangeEvent, useCallback } from 'react';
+import { type ChangeEvent, type ReactNode, useCallback } from 'react';
 import type { DateRange } from 'react-day-picker';
 
-export function DatasetFilter() {
+type ConditionContainerProps = {
+  children: ReactNode;
+  index: number;
+};
+
+function ConditionContainer({ children, index }: ConditionContainerProps) {
+  const removeFilter = useQueryOptionsState((state) => state.removeFilter);
+  return (
+    <div className='flex gap-2'>
+      {children}
+      <Button variant={'outline'} onClick={() => removeFilter(index)} className='p-2'>
+        <Trash2 />
+      </Button>
+    </div>
+  );
+}
+
+function FilterSelect({ index }: { index: number }) {
   const { dataset } = useParams<{ dataset: string }>();
+  const { data: fieldSchemas } = useDatasetSchema(dataset);
+  const { filters, updateFilter } = useQueryOptionsState();
 
-  const { data: fieldSchemas } = useQuery({
-    queryKey: [`/datasets/${dataset}/schema`],
-    queryFn: () => DatasetAPI.getSchema(dataset)
-  });
+  const handleSelectChange = useCallback(
+    (value: string) => {
+      const schema = fieldSchemas.find((field) => field.name === value);
+      if (!schema) return;
 
-  const {
-    filter,
-    setFilterDate: setDate,
-    setFilterNumber: setNumber,
-    setFilterString: setString
-  } = useQueryOptionsState();
-
-  const { refetch: fetchDocuments } = useExtractDocuments(dataset);
-
-  const handleStringInput = useCallback(
-    (fieldName: string) => {
-      return (e: ChangeEvent<HTMLInputElement>) => {
-        setString(fieldName, e.target.value);
-      };
+      if (schema.type === 'keyword') {
+        updateFilter(index, { field: value, exact: '' });
+      } else if (schema.type === 'date') {
+        const lastMonth = new Date();
+        lastMonth.setMonth(lastMonth.getMonth() - 1);
+        updateFilter(index, {
+          field: value,
+          range: {
+            from: lastMonth,
+            to: new Date()
+          }
+        });
+      } else if (schema.type === 'text') {
+        updateFilter(index, { field: value, match: '' });
+      } else {
+        updateFilter(index, { field: value, range: { min: 0, max: 0 } });
+      }
     },
-    [setString]
-  );
-
-  const handleNumberInput = useCallback(
-    (fieldName: string, type: 'min' | 'max') => {
-      return (e: ChangeEvent<HTMLInputElement>) => {
-        setNumber(fieldName, type, e.target.valueAsNumber);
-      };
-    },
-    [setNumber]
-  );
-
-  const handleDateRangeChange = useCallback(
-    (fieldName: string) => {
-      return (range?: DateRange) => setDate(fieldName, range);
-    },
-    [setDate]
+    [index, fieldSchemas, updateFilter]
   );
 
   return (
+    <Select value={filters[index]?.field} onValueChange={handleSelectChange}>
+      <SelectTrigger className='min-w-28 max-w-28'>
+        <SelectValue placeholder='Chọn trường' />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          {fieldSchemas.map((field) => {
+            if (!field.filterable) return null;
+            return (
+              <SelectItem key={field.name} value={field.name}>
+                {field.displayName}
+              </SelectItem>
+            );
+          })}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+}
+
+function DynamicFilter() {
+  const { dataset } = useParams<{ dataset: string }>();
+  const { data: fieldSchemas } = useDatasetSchema(dataset);
+
+  const {
+    filters,
+    reset: resetFilterValues,
+    setFilterDate,
+    setFilterNumber,
+    setFilterString,
+    addFilter
+  } = useQueryOptionsState();
+
+  const handleStringInput = useCallback(
+    (index: number) => {
+      return (e: ChangeEvent<HTMLInputElement>) => {
+        setFilterString(index, e.target.value);
+      };
+    },
+    [setFilterString]
+  );
+
+  const handleNumberInput = useCallback(
+    (index: number, type: 'min' | 'max') => {
+      return (e: ChangeEvent<HTMLInputElement>) => {
+        setFilterNumber(index, type, e.target.valueAsNumber);
+      };
+    },
+    [setFilterNumber]
+  );
+
+  const handleDateRangeChange = useCallback(
+    (index: number) => {
+      return (range?: DateRange) => setFilterDate(index, range);
+    },
+    [setFilterDate]
+  );
+
+  const appendFilter = useCallback(() => {
+    const firstSchema = fieldSchemas[0];
+    if (!firstSchema) return;
+
+    if (firstSchema.type === 'keyword') addFilter({ field: firstSchema.name, exact: '' });
+    else if (firstSchema.type === 'date') {
+      const lastMonth = new Date();
+      lastMonth.setMonth(lastMonth.getMonth() - 1);
+      addFilter({
+        field: firstSchema.name,
+        range: {
+          from: lastMonth,
+          to: new Date()
+        }
+      });
+    } else if (firstSchema.type === 'text') addFilter({ field: firstSchema.name, match: '' });
+    else
+      addFilter({
+        field: firstSchema.name,
+        range: {
+          min: 0,
+          max: 0
+        }
+      });
+  }, [fieldSchemas, addFilter]);
+
+  return (
     <Card>
-      <CardContent className='flex flex-col gap-2 p-4'>
-        {fieldSchemas?.map((field) => {
-          if (!field.filterable) return null;
-          if (field.type === 'keyword' || field.type === 'text') {
+      <CardContent className='flex flex-col gap-2 p-2 min-w-[300px]'>
+        <div className='flex justify-between items-center'>
+          <p className='font-medium leading-none'>Bộ lọc dữ liệu</p>
+          <Button size={'sm'} onClick={resetFilterValues} variant={'outline'} className='p-2'>
+            <FilterX />
+          </Button>
+        </div>
+        {filters.length === 0 && (
+          <small className='text-xs text-muted-foreground'>Không có bộ lọc nào được áp dụng</small>
+        )}
+        {filters.map((filter, index) => {
+          if ('match' in filter) {
             return (
-              <div key={field.name} className='flex-1'>
-                <Label htmlFor={field.name} className='mb-2'>
-                  {field.displayName}
-                </Label>
-                <Input
-                  placeholder={field.description}
-                  type='text'
-                  id={field.name}
-                  onChange={handleStringInput(field.name)}
-                />
-              </div>
+              <ConditionContainer key={`${filter.field}-${index}`} index={index}>
+                <FilterSelect index={index} />
+                <Input value={filter.match} onChange={handleStringInput(index)} />
+              </ConditionContainer>
             );
           }
-          if (field.type === 'long' || field.type === 'double') {
+          if ('range' in filter) {
+            const range = filter.range;
+            if ('from' in range) {
+              return (
+                <ConditionContainer key={`${filter.field}-${index}`} index={index}>
+                  <FilterSelect index={index} />
+                  <DateRangePicker
+                    placeholder='Chọn ngày'
+                    className='w-full'
+                    date={range}
+                    // @ts-ignore
+                    onSelect={handleDateRangeChange(index)}
+                  />
+                </ConditionContainer>
+              );
+            }
+
             return (
-              <div className='flex gap-2' key={field.name}>
-                <div className='flex-1'>
-                  <Label htmlFor={`${field.name}-min`}>{field.displayName} tối thiểu</Label>
-                  <Input
-                    type='number'
-                    id={field.name}
-                    placeholder={field.description}
-                    onChange={handleNumberInput(field.name, 'min')}
-                  />
+              <ConditionContainer key={`${filter.field}-${index}`} index={index}>
+                <FilterSelect index={index} />
+                <div className='flex gap-2'>
+                  <Input value={range.min} placeholder={'Từ'} onChange={handleNumberInput(index, 'min')} />
+                  <Input placeholder={'Đến'} value={range.max} onChange={handleNumberInput(index, 'max')} />
                 </div>
-                <div className='flex-1'>
-                  <Label htmlFor={`${field.name}-max`}>{field.displayName} tối đa</Label>
-                  <Input
-                    type='number'
-                    id={field.name}
-                    placeholder={field.description}
-                    onChange={handleNumberInput(field.name, 'max')}
-                  />
-                </div>
-              </div>
+              </ConditionContainer>
             );
           }
-          if (field.type === 'date') {
+          if ('exact' in filter) {
             return (
-              <div key={field.name} className='flex-1'>
-                <Label htmlFor={field.name}>{field.displayName}</Label>
-                <DateRangePicker
-                  id={field.name}
-                  placeholder={field.description ?? ''}
-                  date={filter[field.name] as DateRange}
-                  // @ts-ignore
-                  onSelect={handleDateRangeChange(field.name)}
-                />
-              </div>
+              <ConditionContainer key={`${filter.field}-${index}`} index={index}>
+                <FilterSelect index={index} />
+                <Input value={filter.exact} onChange={handleStringInput(index)} />
+              </ConditionContainer>
             );
           }
           return null;
         })}
-        <div className='flex mt-2'>
-          <Button
-            className='flex-1'
-            onClick={() => {
-              fetchDocuments();
-            }}
-          >
-            Lọc
-          </Button>
-        </div>
+        <Button variant={'outline'} size={'sm'} className='p-2 w-full' onClick={appendFilter}>
+          <CirclePlus />
+        </Button>
       </CardContent>
     </Card>
+  );
+}
+
+export function DatasetFilter() {
+  return (
+    <DynamicFilter />
+    //     <DropdownMenu>
+    //   <DropdownMenuTrigger asChild>
+    //     <Button size={'sm'}><Filter /> Lọc</Button>
+    //   </DropdownMenuTrigger>
+    //   <DropdownMenuContent className="w-full">
+    //   </DropdownMenuContent>
+    // </DropdownMenu>
   );
 }

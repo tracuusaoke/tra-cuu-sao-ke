@@ -5,7 +5,7 @@ export type Dataset = {
   description: string;
 };
 export type FieldSchema = {
-  type: 'keyword' | 'text' | 'long' | 'double' | 'date' | string;
+  type: 'keyword' | 'text' | 'long' | 'double' | 'date';
   name: string;
   displayName: string;
   description?: string;

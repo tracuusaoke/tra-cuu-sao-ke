@@ -9,7 +9,7 @@ export function useExtractDocuments(dataset: string) {
     queryKey: [`/datasets/${dataset}/documents`],
     queryFn: () => {
       const filter: Record<string, unknown> = {};
-      const filterEntries = Object.entries(queryOptions.filter);
+      const filterEntries = Object.entries(queryOptions.filters);
       for (const [key, value] of filterEntries) {
         if (typeof value === 'object') {
           if ('from' in value) filter[key] = { min: value.from, max: value.to };
@@ -23,7 +23,7 @@ export function useExtractDocuments(dataset: string) {
       }
       const options = {
         filter: filter,
-        sort: queryOptions.sort,
+        sort: queryOptions.sorts,
         pagination: queryOptions.pagination
       };
       return DatasetAPI.getDocuments(dataset, options);
