@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { DateRangePicker } from '@/components/ui/dateRangePicker';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/select';
 import { useDatasetSchema } from '@/hooks/data/useDatasetSchema';
 import { useQueryOptionsState } from '@/states/filter';
-import { CirclePlus, FilterX, Trash2 } from 'lucide-react';
+import { CirclePlus, Filter, FilterX, Trash2 } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { type ChangeEvent, type ReactNode, useCallback } from 'react';
 import type { DateRange } from 'react-day-picker';
@@ -151,80 +151,80 @@ function DynamicFilter() {
   }, [fieldSchemas, addFilter]);
 
   return (
-    <Card>
-      <CardContent className='flex flex-col gap-2 p-2 min-w-[300px]'>
-        <div className='flex justify-between items-center'>
-          <p className='font-medium leading-none'>Bộ lọc dữ liệu</p>
-          <Button size={'sm'} onClick={resetFilterValues} variant={'outline'} className='p-2'>
-            <FilterX />
-          </Button>
-        </div>
-        {filters.length === 0 && (
-          <small className='text-xs text-muted-foreground'>Không có bộ lọc nào được áp dụng</small>
-        )}
-        {filters.map((filter, index) => {
-          if ('match' in filter) {
-            return (
-              <ConditionContainer key={`${filter.field}-${index}`} index={index}>
-                <FilterSelect index={index} />
-                <Input value={filter.match} onChange={handleStringInput(index)} />
-              </ConditionContainer>
-            );
-          }
-          if ('range' in filter) {
-            const range = filter.range;
-            if ('from' in range) {
-              return (
-                <ConditionContainer key={`${filter.field}-${index}`} index={index}>
-                  <FilterSelect index={index} />
-                  <DateRangePicker
-                    placeholder='Chọn ngày'
-                    className='w-full'
-                    date={range}
-                    // @ts-ignore
-                    onSelect={handleDateRangeChange(index)}
-                  />
-                </ConditionContainer>
-              );
-            }
-
-            return (
-              <ConditionContainer key={`${filter.field}-${index}`} index={index}>
-                <FilterSelect index={index} />
-                <div className='flex gap-2'>
-                  <Input value={range.min} placeholder={'Từ'} onChange={handleNumberInput(index, 'min')} />
-                  <Input placeholder={'Đến'} value={range.max} onChange={handleNumberInput(index, 'max')} />
-                </div>
-              </ConditionContainer>
-            );
-          }
-          if ('exact' in filter) {
-            return (
-              <ConditionContainer key={`${filter.field}-${index}`} index={index}>
-                <FilterSelect index={index} />
-                <Input value={filter.exact} onChange={handleStringInput(index)} />
-              </ConditionContainer>
-            );
-          }
-          return null;
-        })}
-        <Button variant={'outline'} size={'sm'} className='p-2 w-full' onClick={appendFilter}>
-          <CirclePlus />
+    <div className='flex flex-col gap-2 min-w-[300px]'>
+      <div className='flex justify-between items-center'>
+        <p className='font-medium leading-none'>Bộ lọc dữ liệu</p>
+        <Button size={'sm'} onClick={resetFilterValues} variant={'outline'} className='p-2'>
+          <FilterX />
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+      {filters.length === 0 && (
+        <small className='text-xs text-muted-foreground'>Không có bộ lọc nào được áp dụng</small>
+      )}
+      {filters.map((filter, index) => {
+        if ('match' in filter) {
+          return (
+            <ConditionContainer key={`${filter.field}-${index}`} index={index}>
+              <FilterSelect index={index} />
+              <Input value={filter.match} onChange={handleStringInput(index)} />
+            </ConditionContainer>
+          );
+        }
+        if ('range' in filter) {
+          const range = filter.range;
+          if ('from' in range) {
+            return (
+              <ConditionContainer key={`${filter.field}-${index}`} index={index}>
+                <FilterSelect index={index} />
+                <DateRangePicker
+                  placeholder='Chọn ngày'
+                  className='w-full'
+                  date={range}
+                  // @ts-ignore
+                  onSelect={handleDateRangeChange(index)}
+                />
+              </ConditionContainer>
+            );
+          }
+
+          return (
+            <ConditionContainer key={`${filter.field}-${index}`} index={index}>
+              <FilterSelect index={index} />
+              <div className='flex gap-2'>
+                <Input value={range.min} placeholder={'Từ'} onChange={handleNumberInput(index, 'min')} />
+                <Input placeholder={'Đến'} value={range.max} onChange={handleNumberInput(index, 'max')} />
+              </div>
+            </ConditionContainer>
+          );
+        }
+        if ('exact' in filter) {
+          return (
+            <ConditionContainer key={`${filter.field}-${index}`} index={index}>
+              <FilterSelect index={index} />
+              <Input value={filter.exact} onChange={handleStringInput(index)} />
+            </ConditionContainer>
+          );
+        }
+        return null;
+      })}
+      <Button variant={'outline'} size={'sm'} className='p-2 w-full' onClick={appendFilter}>
+        <CirclePlus />
+      </Button>
+    </div>
   );
 }
 
 export function DatasetFilter() {
   return (
-    <DynamicFilter />
-    //     <DropdownMenu>
-    //   <DropdownMenuTrigger asChild>
-    //     <Button size={'sm'}><Filter /> Lọc</Button>
-    //   </DropdownMenuTrigger>
-    //   <DropdownMenuContent className="w-full">
-    //   </DropdownMenuContent>
-    // </DropdownMenu>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size={'sm'}>
+          <Filter /> Lọc
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className='w-full p-2'>
+        <DynamicFilter />
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
