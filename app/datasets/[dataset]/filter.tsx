@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DateRangePicker } from '@/components/ui/dateRangePicker';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -11,10 +12,11 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { useDatasetSchema } from '@/hooks/data/useDatasetSchema';
+import { useExtractDocuments } from '@/hooks/data/useExtractDocuments';
 import { useQueryOptionsState } from '@/states/filter';
-import { CirclePlus, Filter, FilterX, Trash2 } from 'lucide-react';
+import { CirclePlus, FilterX, ListFilter, Trash2 } from 'lucide-react';
 import { useParams } from 'next/navigation';
-import { type ChangeEvent, type ReactNode, useCallback } from 'react';
+import { type ChangeEvent, type ReactNode, useCallback, useState } from 'react';
 import type { DateRange } from 'react-day-picker';
 
 type ConditionContainerProps = {
@@ -215,14 +217,30 @@ function DynamicFilter() {
 }
 
 export function DatasetFilter() {
+  const dataset = useParams<{ dataset: string }>().dataset;
+  const filters = useQueryOptionsState((state) => state.filters);
+  const { refetch: fetchDocuments } = useExtractDocuments(dataset);
+  const [open, setOpen] = useState(false);
+
   return (
-    <DropdownMenu>
+    <DropdownMenu
+      onOpenChange={(value) => {
+        if (!value) fetchDocuments();
+        setOpen(value);
+      }}
+      open={open}
+    >
       <DropdownMenuTrigger asChild>
-        <Button size={'sm'}>
-          <Filter /> Lọc
+        <Button size={'sm'} variant={'outline'}>
+          <span className='hidden sm:block'>Lọc</span> <ListFilter />{' '}
+          {filters.length > 0 && (
+            <Badge className='px-2 bg-slate-100 hover:bg-slate-100 text-primary border-secondary shadow-none'>
+              {filters.length}
+            </Badge>
+          )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className='w-full p-2'>
+      <DropdownMenuContent className='p-2' side='bottom'>
         <DynamicFilter />
       </DropdownMenuContent>
     </DropdownMenu>

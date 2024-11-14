@@ -1,6 +1,5 @@
 'use client';
 
-import { DatasetFilter } from './filter';
 import { DatasetTable } from './table';
 
 // keyword -> Text input
@@ -11,7 +10,6 @@ import { DatasetTable } from './table';
 export default function DatasetPage() {
   return (
     <div className='flex flex-col gap-4'>
-      <DatasetFilter />
       <DatasetTable />
     </div>
   );
