@@ -1,9 +1,12 @@
+import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useDatasetSchema } from '@/hooks/data/useDatasetSchema';
 import { useExtractDocuments } from '@/hooks/data/useExtractDocuments';
 import type { FieldSchema } from '@/lib/api/dataset';
+import { useQueryOptionsState } from '@/states/filter';
+import { RotateCcw } from 'lucide-react';
 import { useParams } from 'next/navigation';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { ExportData } from './export';
 import { DatasetFilter } from './filter';
 import { DatasetSort } from './sort';
@@ -18,8 +21,14 @@ export function DatasetTable() {
     }
     return map;
   }, [fieldSchema]);
+  const { reset: resetQuery } = useQueryOptionsState();
 
-  const { data: records, isFetched } = useExtractDocuments(dataset);
+  const { data: records, isFetched, refetch: refetchDocuments } = useExtractDocuments(dataset);
+  const resetTable = useCallback(() => {
+    resetQuery();
+    // Wait for the reset to finish
+    setTimeout(() => refetchDocuments(), 100);
+  }, [resetQuery, refetchDocuments]);
 
   return (
     <div className='p-4'>
@@ -27,6 +36,9 @@ export function DatasetTable() {
         <div className='flex gap-2'>
           <DatasetFilter />
           <DatasetSort />
+          <Button variant='outline' size={'sm'} onClick={resetTable}>
+            <RotateCcw />
+          </Button>
         </div>
         <ExportData />
       </div>

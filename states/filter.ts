@@ -26,14 +26,23 @@ type QueryOptionState = {
   filters: DatasetFilter[];
   sorts: DatasetSort[];
   pagination: DatasetPagination;
+
+  // For sorting
+  addSort(sort: DatasetSort): void;
+  updateSort(index: number, sort: DatasetSort): void;
+  removeSort(index: number): void;
+
+  // For pagination
+  setPagination(pagination: DatasetPagination): void;
+
+  // For filter
   setFilterString(index: number, value: string): void;
   setFilterNumber(index: number, type: 'min' | 'max', value: number): void;
   setFilterDate(index: number, range?: DateRange): void;
-
   addFilter(filter: DatasetFilter): void;
   updateFilter(index: number, filter: DatasetFilter): void;
   removeFilter(index: number): void;
-  setPagination(pagination: DatasetPagination): void;
+
   reset(): void;
 };
 
@@ -41,7 +50,7 @@ export const useQueryOptionsState = create<QueryOptionState>((set) => ({
   filters: [],
   sorts: [],
   pagination: {
-    limit: 100,
+    limit: 20,
     offset: 0
   },
   reset() {
@@ -49,6 +58,23 @@ export const useQueryOptionsState = create<QueryOptionState>((set) => ({
   },
   setPagination(pagination) {
     set({ pagination });
+  },
+  addSort(sort) {
+    set((state) => {
+      return { sorts: [...state.sorts, sort] };
+    });
+  },
+  updateSort(index, sort) {
+    set((state) => {
+      const newSorts = state.sorts.map((s, i) => (i === index ? sort : s));
+      return { sorts: newSorts };
+    });
+  },
+  removeSort(index) {
+    set((state) => {
+      const newSorts = state.sorts.filter((_, i) => i !== index);
+      return { sorts: newSorts };
+    });
   },
   addFilter(filter) {
     set((state) => {

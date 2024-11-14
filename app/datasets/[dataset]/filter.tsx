@@ -14,7 +14,7 @@ import {
 import { useDatasetSchema } from '@/hooks/data/useDatasetSchema';
 import { useExtractDocuments } from '@/hooks/data/useExtractDocuments';
 import { useQueryOptionsState } from '@/states/filter';
-import { CirclePlus, FilterX, ListFilter, Trash2 } from 'lucide-react';
+import { CirclePlus, ListFilter, Trash2 } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { type ChangeEvent, type ReactNode, useCallback, useState } from 'react';
 import type { DateRange } from 'react-day-picker';
@@ -92,14 +92,7 @@ function DynamicFilter() {
   const { dataset } = useParams<{ dataset: string }>();
   const { data: fieldSchemas } = useDatasetSchema(dataset);
 
-  const {
-    filters,
-    reset: resetFilterValues,
-    setFilterDate,
-    setFilterNumber,
-    setFilterString,
-    addFilter
-  } = useQueryOptionsState();
+  const { filters, setFilterDate, setFilterNumber, setFilterString, addFilter } = useQueryOptionsState();
 
   const handleStringInput = useCallback(
     (index: number) => {
@@ -154,12 +147,7 @@ function DynamicFilter() {
 
   return (
     <div className='flex flex-col gap-2 min-w-[300px]'>
-      <div className='flex justify-between items-center'>
-        <p className='font-medium leading-none'>Bộ lọc dữ liệu</p>
-        <Button size={'sm'} onClick={resetFilterValues} variant={'outline'} className='p-2'>
-          <FilterX />
-        </Button>
-      </div>
+      <p className='font-medium leading-none mt-1'>Bộ lọc dữ liệu</p>
       {filters.length === 0 && (
         <small className='text-xs text-muted-foreground'>Không có bộ lọc nào được áp dụng</small>
       )}
