@@ -50,11 +50,11 @@ export const useQueryOptionsState = create<QueryOptionState>((set) => ({
   filters: [],
   sorts: [],
   pagination: {
-    limit: 20,
+    limit: 10,
     offset: 0
   },
   reset() {
-    set({ filters: [], sorts: [], pagination: { limit: 100, offset: 0 } });
+    set({ filters: [], sorts: [], pagination: { limit: 10, offset: 0 } });
   },
   setPagination(pagination) {
     set({ pagination });

@@ -9,6 +9,7 @@ import { useParams } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
 import { ExportData } from './export';
 import { DatasetFilter } from './filter';
+import { DatasetPagination } from './pagination';
 import { DatasetSort } from './sort';
 
 export function DatasetTable() {
@@ -105,6 +106,8 @@ export function DatasetTable() {
           </div>
         ))}
       </div>
+
+      <DatasetPagination />
     </div>
   );
 }
