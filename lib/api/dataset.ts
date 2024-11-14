@@ -29,7 +29,46 @@ type Document = {
   [key: string]: unknown;
 };
 
-async function getDocuments<T = Document>(dataset: string, options: unknown): Promise<T[]> {
+type DocumentFilterDate = {
+  field: string;
+  range: {
+    from?: Date;
+    to?: Date;
+  };
+};
+type DocumentFilterNumber = {
+  field: string;
+  range: {
+    min?: number;
+    max?: number;
+  };
+};
+
+type DocumentFilterText = {
+  field: string;
+  match: string;
+};
+
+type DocumentFilterKeyword = {
+  field: string;
+  exact: string;
+};
+
+type DocumentFilter = DocumentFilterDate | DocumentFilterNumber | DocumentFilterText | DocumentFilterKeyword;
+
+type GetDocumentOptions = {
+  filters?: DocumentFilter[];
+  sorts?: {
+    field: string;
+    order: 'asc' | 'desc';
+  }[];
+  pagination?: {
+    limit: number;
+    offset: number;
+  };
+};
+
+async function getDocuments<T = Document>(dataset: string, options: GetDocumentOptions): Promise<T[]> {
   const resp = await api.post(`/api/datasets/${dataset}/documents`, options);
   return resp.data;
 }
