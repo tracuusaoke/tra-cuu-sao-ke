@@ -13,7 +13,6 @@ export function useExtractDocuments(dataset: string) {
         pagination,
         sorts
       }),
-    initialData: [],
-    enabled: true
+    initialData: []
   });
 }
