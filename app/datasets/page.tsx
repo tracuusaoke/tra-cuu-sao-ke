@@ -11,11 +11,13 @@ export default function DatasetPage() {
   });
 
   return (
-    <div>
+    <div className='p-4 flex flex-col'>
       {datasets?.map((dataset) => (
-        <div key={dataset.name}>
-          <Link href={`/datasets/${dataset.name}`}>{dataset.name}</Link>
-        </div>
+        <Link key={dataset.name} href={`/datasets/${dataset.name}`}>
+          <div className='px-4 py-2 rounded-md border shadow-sm'>
+            <p className='font-medium text-primary'>{dataset.name}</p>
+          </div>
+        </Link>
       ))}
     </div>
   );
